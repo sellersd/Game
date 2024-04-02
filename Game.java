@@ -1,7 +1,16 @@
+package Projects.Demos.Game;
+
+import java.util.Random;
 import java.util.Scanner;
 
 class Game {
   public static void main(String[] args) {
+
+    Scanner sc = new Scanner(System.in);
+
+    boolean running = true;
+    String cmd;
+
     NPC p1 = new NPC();
     Ogre p2 = new Ogre();
     Player p3 = new Player();
@@ -9,91 +18,23 @@ class Game {
     p1.print_attributes();
     p2.print_attributes();
     p3.print_attributes();
-  }
-}
 
-class NPC {
-  protected String name = "A generic NPC";
+    while (running) {
+      System.out.print(">>> ");
+      cmd = sc.nextLine();
 
-  // protected String species = "human";
-  protected Human species = new Human();
-  protected int level = 0;
-  protected int experience = 0;
+      if (cmd.equals("camp")) {
 
-  protected int strength;
-  protected int reflexes;
-  protected int wisdom;
+      } else if (cmd.equals("attack")) {
+        Combat c = new Combat(p3, p2);
+      } else {
+        System.out.println("I do not understand what you are trying to do.");
+      }
 
-  protected int health;
+    }
 
-  NPC() {
+    sc.close();
 
-    strength = 5 + species.get_str_mod();
-    reflexes = 5 + species.get_ref_mod();
-    wisdom = 5 + species.get_wis_mod();
-    health = calculate_health();
-  }
-
-  public int calculate_health() {
-    return 10 + 10 * level;
-  }
-
-  public int get_health() {
-    return health;
-  }
-
-  public String get_name() {
-    return name;
-  }
-
-  public int get_level() {
-    return level;
-  }
-
-  public int get_experience() {
-    return experience;
-  }
-
-  // public String get_species() {
-  // return species;
-  // }
-
-  public int get_strength() {
-    return strength;
-  }
-
-  public int get_reflexes() {
-    return reflexes;
-  }
-
-  public int get_wisdom() {
-    return wisdom;
-  }
-
-  public void print_attributes() {
-    System.out.println("\n\n**************************************************");
-    System.out.println(name);
-    System.out.println("Species\tLevel\tExperience");
-    System.out.println(String.format("%s\t%d\t%d", species, level, experience));
-
-    System.out.println("Health: " + health);
-    System.out.println("Strength: " + strength);
-    System.out.println("Reflexes: " + reflexes);
-    System.out.println("Wisdom: " + wisdom);
-
-    System.out.println("**************************************************\n\n");
-
-  }
-}
-
-class Ogre extends NPC {
-
-  Ogre() {
-    name = "a monstrous ogre";
-    // species = "ogre";
-    strength = 12;
-    reflexes = 3;
-    wisdom = 1;
   }
 
 }
@@ -137,6 +78,7 @@ class Player extends NPC {
       return new Elf();
     } else {
       System.out.println("invalid choice");
+      return new Human();
     }
 
   }
@@ -195,5 +137,62 @@ class Elf extends Species {
     str_mod = 1;
     ref_mod = 1;
     wis_mod = 1;
+  }
+}
+
+class Combat {
+
+  Random rand = new Random();
+
+  Combat(NPC att, NPC def) {
+
+  }
+
+  public void attack(NPC att, NPC def) {
+
+    int threshold = 10;
+
+    int AS = att.get_strength() + att.get_reflexes() / 10;
+    int DS = def.get_reflexes() + att.get_strength() / 10;
+
+    int d10 = rand.nextInt(10) + 1;
+    int total = AS - DS + d10;
+
+    System.out.println(att.get_name() + " attacks " + def.get_name());
+    System.out.println("AS: " + AS + " - DS: " + DS + " d10: " + d10 + " = " + total);
+
+    if (total > threshold) {
+      System.out.println("Hit!");
+      int diff = threshold - total;
+      int dmg = calculate_damage(att, def, diff);
+      update_health(def, dmg);
+    } else {
+      System.out.println("Miss!");
+    }
+  }
+
+  public int calculate_damage(NPC att, NPC def, int diff) {
+    int weapon_damage = att.get_weapon_damage();
+    int armor_protection = def.get_armor_protection();
+
+    int damage = 0;
+
+    if (diff > 10) {
+      System.out.println("Critical hit!");
+      damage = 3 * weapon_damage - armor_protection;
+    } else if (diff > 5) {
+      System.out.println("Solid hit!");
+      damage = weapon_damage - armor_protection;
+    } else {
+      damage = (int) (0.5 * (weapon_damage - armor_protection));
+
+    }
+
+    return damage;
+  }
+
+  public void update_health(NPC def, int diff) {
+    System.out.println("Stub");
+
   }
 }
