@@ -1,10 +1,16 @@
+package Projects.Demos.Game;
+
 import java.util.Random;
 
 class Combat {
 
   Random rand = new Random();
 
-  public attack(NPC att, NPC def) {
+  Combat(NPC att, NPC def) {
+
+  }
+
+  public void attack(NPC att, NPC def) {
 
     int threshold = 10;
 
@@ -17,34 +23,34 @@ class Combat {
     System.out.println(att.get_name() + " attacks " + def.get_name());
     System.out.println("AS: " + AS + " - DS: " + DS + " d10: " + d10 + " = " + total);
 
-    if(total > threshold) {
+    if (total > threshold) {
       System.out.println("Hit!");
       int diff = threshold - total;
-      update_health(def, diff);
-    }
-    else {
+      int dmg = calculate_damage(att, def, diff);
+      update_health(def, dmg);
+    } else {
       System.out.println("Miss!");
     }
   }
 
-  public calculate_damage(NPC att, NPC def) {
+  public int calculate_damage(NPC att, NPC def, int diff) {
     int weapon_damage = att.get_weapon_damage();
     int armor_protection = def.get_armor_protection();
 
     int damage = 0;
 
-    if(diff > 10) {
+    if (diff > 10) {
       System.out.println("Critical hit!");
       damage = 3 * weapon_damage - armor_protection;
-    }
-    else if(diff > 5) {
+    } else if (diff > 5) {
       System.out.println("Solid hit!");
       damage = weapon_damage - armor_protection;
-    }
-    else {
-      damage = (int)(0.5 * (weapon_damage - armor_protection));
+    } else {
+      damage = (int) (0.5 * (weapon_damage - armor_protection));
 
     }
+
+    return damage;
   }
 
   public void update_health(NPC def, int diff) {
